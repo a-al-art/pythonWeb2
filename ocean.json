@@ -1,0 +1,11 @@
+{
+  "same": {
+    "eccentric anomaly": 48,
+    "primary era": 16
+  },
+  "different": {
+    "secondary movement": -16,
+    "inclination": 3,
+    "stellar dynamics": 99
+  }
+}
