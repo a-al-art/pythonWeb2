@@ -1,4 +1,4 @@
-from flask import Flask, url_for, request
+from flask import Flask, url_for, request, render_template
 
 app = Flask(__name__)
 
@@ -6,7 +6,9 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/index')
 def index():
-    return "<h1>Привет, Яндекс!</h1><br />Ура!"
+    user = "Ученик Академии Яндекса"
+    return render_template('index.html', title='Домашняя страница',
+                           username=user)
 
 
 @app.route('/second')
@@ -70,25 +72,26 @@ def return_sample_page():
                 </html>"""
 
 
-@app.route('/greeting/<username>')
-def greeting(username):
-    return f'''<!doctype html>
-                <html lang="en">
-                  <head>
-                    <meta charset="utf-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                   <link rel="stylesheet"
-                   href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
-                   integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
-                   crossorigin="anonymous">
-                    <title>Привет, {username}</title>
-                  </head>
-                  <body>
-                    <h1>Привет, {username}!</h1>
-                  </body>
-                </html>'''
-
-
+#
+# @app.route('/greeting/<username>')
+# def greeting(username):
+#     return f'''<!doctype html>
+#                 <html lang="en">
+#                   <head>
+#                     <meta charset="utf-8">
+#                     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+#                    <link rel="stylesheet"
+#                    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+#                    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+#                    crossorigin="anonymous">
+#                     <title>Привет, {username}</title>
+#                   </head>
+#                   <body>
+#                     <h1>Привет, {username}!</h1>
+#                   </body>
+#                 </html>'''
+#
+#
 
 @app.route('/form_sample', methods=['POST', 'GET'])
 def form_sample():
@@ -107,8 +110,9 @@ def form_sample():
                           </head>
                           <body>
                             <h1>Форма для регистрации в суперсекретной системе</h1>
+                            <h2>(сверхсекретно)</h2>
                             <div>
-                                <form class="login_form" method="post">
+                                <form class="login_form" method="post" enctype="multipart/form-data">
                                     <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Введите адрес почты" name="email">
                                     <input type="password" class="form-control" id="password" placeholder="Введите пароль" name="password">
                                     <div class="form-group">
@@ -154,14 +158,22 @@ def form_sample():
                           </body>
                         </html>'''
     elif request.method == 'POST':
-        print(request.form['email'])
-        print(request.form['password'])
-        print(request.form['class'])
-        print(request.form['file'])
-        print(request.form['about'])
-        print(request.form['accept'])
-        print(request.form['sex'])
-        return "Форма отправлена"
+        try:
+            print(request.form['email'])
+            print(request.form['password'])
+            print(request.form['class'])
+            # print(request.form['file'])
+            print(request.form['about'])
+            print(request.form['accept'])
+            print(request.form['sex'])
+            f = request.files['file']
+            with open(f'uploaded_file_{f.filename}', 'wb' ) as out_file:
+                out_file.write(f.read())
+            print(f.read())
+            return "Форма отправлена <a href='form_sample'>Заполнить форму</a>"
+        except Exception as e:
+            print(e, type(e))
+            return "Отправка не удалась <a href='form_sample'>Заполнить форму</a>"
 
 if __name__ == '__main__':
     app.run(port=8080, host='127.0.0.1')

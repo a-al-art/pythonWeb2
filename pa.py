@@ -1,25 +1,34 @@
-import argparse
+from flask import Flask, url_for, request
+
+app = Flask(__name__)
+
+
+@app.route('/')
+@app.route('/index')
+def main_page():
+    return "<h1>Привет, Яндекс!</h1><br />Ура!"
+
+
+@app.route('/second')
+def second_page():
+    return """Second <p>page</p>
+1
+<div>2</div>"""
+
+
+@app.route('/countdown')
+def countdown():
+    countdown_list = [str(x) for x in range(10, 0, -1)]
+    countdown_list.append('Пуск!')
+    return '</br>'.join(countdown_list)
+
+
+@app.route('/image_sample')
+def image():
+    return f'''<img width=500pt src="{url_for('static', filename='img/owl.jpeg')}" 
+           alt="та самая сова">'''
 
 
 
-
-
-parser = argparse.ArgumentParser()
-
-parser.add_argument('--cars', type=int, default=50)
-parser.add_argument('--barbie', type=int, default=50)
-parser.add_argument('--movie', choices=['melodrama', 'football', 'other'], default='other')
-my_args = parser.parse_args()
-
-if my_args.barbie > 100 or my_args.barbie < 0:
-    my_args.barbie = 50
-
-if my_args.cars > 100 or my_args.cars < 0:
-    my_args.cars = 50
-
-my_args.movie = (0 if my_args.movie == 'melodrama' else (100 if my_args.movie == 'football' else 50))
-
-boy = int((100 - my_args.barbie + my_args.cars + my_args.movie) / 3)
-girl = 100 - boy
-print(f'''boy: {boy}
-girl: {girl}''')
+if __name__ == '__main__':
+    app.run(port=8080, host='127.0.0.1')
