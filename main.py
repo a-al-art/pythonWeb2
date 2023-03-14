@@ -1,11 +1,13 @@
 from flask import Flask, url_for, request, render_template, redirect
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField
 from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
-from data.news import News
+from werkzeug.utils import secure_filename
+
 from data import db_session
 from data.users import User
+from data.news import News
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -20,6 +22,24 @@ class LoginForm(FlaskForm):
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
+
+
+class AvatarForm(FlaskForm):
+    file = FileField("Файл", validators=[DataRequired()])
+    submit = SubmitField('Загрузить')
+
+
+@app.route('/avatar', methods=['GET', 'POST'])
+def avatar():
+    form = AvatarForm()
+    if form.validate_on_submit():
+        print(form.file.data.filename)
+        avatar_file = url_for('static', filename=f'img/loaded_{secure_filename(form.file.data.filename)}')
+        avatar_file = avatar_file.lstrip('/')
+        print(avatar_file)
+        form.file.data.save(avatar_file)
+        return render_template('avatar.html', form=form, avatar=avatar_file)
+    return render_template('avatar.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -56,10 +76,16 @@ def main():
         for user in db_sess.query(User).all():
             print(user)
 
+        print('---')
+        for news in user.news:
+            print(news)
+        # Почему удалось создать новость от несуществующего пользователя?
+        # news = News(title="Первая новость", content="Привет блог!",
+        #             user_id=5, is_private=False)
+        # db_sess.add(news)
+        # db_sess.commit()
 
-
-
-    app.run()  # app.run(port=8080, host='127.0.0.1')
+    app.run()  # port=8080, host='127.0.0.1'
 
 
 def tmp_fill_base():
@@ -69,7 +95,6 @@ def tmp_fill_base():
     user.email = "admin@email.com"
     db_sess = db_session.create_session()
     db_sess.add(user)
-    db_sess.commit()
     news = News(title="Первая новость", content="Привет блог!",
                 user_id=1, is_private=False)
     db_sess.add(news)
@@ -79,5 +104,6 @@ def tmp_fill_base():
 if __name__ == '__main__':
     x = generate_password_hash('123')
     print(x)
+    # первый аргумент - сохранённый хэш, второй - введённый пароль
     print(check_password_hash(x, '123'))
     main()
