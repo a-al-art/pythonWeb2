@@ -3,7 +3,7 @@ import sqlalchemy
 from flask_login import UserMixin
 from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(SqlAlchemyBase, UserMixin):
@@ -23,3 +23,11 @@ class User(SqlAlchemyBase, UserMixin):
 
     def __repr__(self):
         return f'{self.id} {self.name} {self.email} {self.created_date}'
+
+    def check_password(self, form_password):
+        # первый аргумент - сохранённый хэш, второй - введённый пароль
+        return check_password_hash(self.hashed_password, form_password)
+
+    @staticmethod
+    def get_password_hash(password):
+        return generate_password_hash(password)
