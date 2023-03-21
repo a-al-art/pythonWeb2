@@ -1,11 +1,11 @@
-from flask import Flask, url_for, render_template, redirect, session
+from flask import Flask, url_for, render_template, redirect, session, jsonify
 from flask_wtf import FlaskForm
 from wtforms import EmailField, StringField, PasswordField, BooleanField, SubmitField, FileField
 from wtforms.validators import DataRequired
 from werkzeug.utils import secure_filename
 from flask_login import LoginManager, login_user
-
-from data import db_session
+from flask import make_response
+from data import db_session, news_api
 from data.users import User
 from data.news import News
 
@@ -45,6 +45,12 @@ class AvatarForm(FlaskForm):
 
 
 # TODO: logout
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found 404'}), 404)
+
 
 @app.route('/avatar', methods=['GET', 'POST'])
 def avatar():
@@ -133,7 +139,7 @@ def main():
         #             user_id=5, is_private=False)
         # db_sess.add(news)
         # db_sess.commit()
-
+    app.register_blueprint(news_api.blueprint)
     app.run()  # port=8080, host='127.0.0.1'
 
 
