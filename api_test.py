@@ -6,15 +6,17 @@
 
 from requests import get, post
 
-all_news = get('http://localhost:5000/api/news').json()
+all_news = get('http://localhost:5000/api/v2/news').json()
 print(all_news)
 for news_ in all_news['news']:
-    if 'Вторая' in news_['title']:
-        news_from_api = get(f'http://localhost:5000/api/news/{news_["id"]}').json()
+    print(news_)
+    if 'Newest' in news_['title']:
+        news_from_api = get(f'http://localhost:5000/api/v2/news/{news_["id"]}').json()
         print('--', news_from_api)
 
-print(post('http://localhost:5000/api/news',
-           json={'title': 'Заголовок',
-                 'content': 'Текст новости',
-                 'user_id': 9,
-                 'is_private': True}).json())
+# print(post('http://localhost:5000/api/v2/news',
+#            json={'title': 'The Newest News',
+#                  'content': 'Very interesting text!!!',
+#                  'user_id': 1,
+#                  'i
+#                  s_private': False}).json())
