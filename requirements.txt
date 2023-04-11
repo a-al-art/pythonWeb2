@@ -5,3 +5,4 @@ flask-wtf
 sqlalchemy
 werkzeug
 flask-login
+sqlalchemy-serializer
